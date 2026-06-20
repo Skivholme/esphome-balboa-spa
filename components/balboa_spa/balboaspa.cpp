@@ -33,6 +33,7 @@ namespace esphome
                 status_clear_error();
             }
 
+
             // Filter settings periodic update timer (every 5 minutes)
             if (filtersettings_request_status == 2)
             {
@@ -291,7 +292,7 @@ namespace esphome
             {
                 return;
             }
-                
+
             // FIX: ingen frame i gang -> kun 0x7E må starte en.
             if (input_queue.size() == 0 && received_byte != 0x7E)
             {
@@ -313,6 +314,17 @@ namespace esphome
             }
 
             input_queue.push(received_byte);
+
+            // FIX (mis-align lock-in): a real Balboa length byte is always >= 5. If the 2nd byte
+            // (the length) is < 5, we latched onto an inter-frame EOF 7E followed by a stray 0x00
+            // instead of a real SOF. Drop this false start; the next real SOF follows immediately
+            // and re-aligns us. Without this the parser locks into 7E-00-7E garbage forever and
+            // drops every real (CTS / new-client / status) frame body byte-by-byte.
+            if (input_queue.size() == 2 && input_queue[1] < 5)
+            {
+                input_queue.clear();
+                return;
+            }
 
             // Complete package
             // if (received_byte == 0x7E && input_queue[0] == 0x7E && input_queue[1] != 0x7E) {
