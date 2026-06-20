@@ -45,7 +45,8 @@ namespace esphome
                 }
             }
 
-            while (available())
+            uint16_t wdg_guard = 0;
+            while (available() && wdg_guard++ < 2048)
             {
                 read_serial();
             }
@@ -573,7 +574,7 @@ namespace esphome
 
             // print_msg(output_queue);
 
-            flush();
+            // flush(); // REMOVED: blocking flush can trip the task watchdog
 
             // DEBUG: print_msg(output_queue);
             output_queue.clear();
