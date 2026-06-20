@@ -370,6 +370,8 @@ namespace esphome
                 }
                 else if (input_queue[2] == client_id && input_queue[4] == 0x06)
                 { // we have an ID, do clever stuff
+                    if (send_command != 0x00)
+                        ESP_LOGI(TAG, "Spa/tx: client 0x%02X got CTS, sending command 0x%02X", client_id, send_command);
                     // client_id BF 06:Ready to Send
                     if (send_command == 0x21)
                     {
