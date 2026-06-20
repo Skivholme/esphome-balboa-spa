@@ -79,18 +79,11 @@ namespace esphome
                 // Max attempts reached
                 // Special case: If trying to turn OFF but stuck in HIGH mode (2), 
                 // do one final toggle to try to get to LOW mode (1)
-                if (target_state == 0 && jet_state >= 2)
-                {
-                    this->discard_updates = this->discard_updates_config;
-                    this->toggle_jet();
-                    ESP_LOGW(tag, "Spa/%s: failed to turn OFF after %d attempts, trying one final toggle from HIGH to LOW mode",
-                             jet_name, this->max_toggle_attempts);
-                }
-                else
-                {
-                    ESP_LOGW(tag, "Spa/%s: failed to reach target state after %d attempts - spa may be in filter cycle or maintenance mode",
-                             jet_name, this->max_toggle_attempts);
-                }
+                // SINGLE-speed fix: no extra "HIGH->LOW" toggle here. On a 1-speed
+                // pump (off<->on, on reported as state 2) that second toggle just
+                // turns it back on, so it could never turn off. One toggle per press.
+                ESP_LOGW(tag, "Spa/%s: not at target after %d attempts; syncing to actual spa state",
+                         jet_name, this->max_toggle_attempts);
                 
                 // Reset state machine and sync with spa
                 this->desired_state = ToggleStateMaybe::DONT_KNOW;
