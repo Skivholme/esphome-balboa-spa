@@ -290,7 +290,13 @@ namespace esphome
             {
                 return;
             }
-
+                
+            // FIX: ingen frame i gang -> kun 0x7E må starte en.
+            if (input_queue.size() == 0 && received_byte != 0x7E)
+            {
+                return;
+            }
+                
             // Drop until SOF is seen
             if (input_queue.first() != 0x7E && received_byte != 0x7E)
             {
