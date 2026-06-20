@@ -574,7 +574,7 @@ namespace esphome
 
             // print_msg(output_queue);
 
-            // flush(); // REMOVED: blocking flush can trip the task watchdog
+            flush(); // restored: paces the poll replies so commands land in the spa's window
 
             // DEBUG: print_msg(output_queue);
             output_queue.clear();
