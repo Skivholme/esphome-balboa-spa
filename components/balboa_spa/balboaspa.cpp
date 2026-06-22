@@ -425,9 +425,10 @@ namespace esphome
                             faultlog_request_status = 1;
                             ESP_LOGD(TAG, "Spa/debug/faultlog_request_status: %s", "requesting fault log, #1");
                         }
-                        else if (filtersettings_request_status == 0 &&
-                                 (faultlog_request_status == 2 || faultlog_request_status == 0))
-                        { // Get the filter cycles log once we have the faultlog, or periodically
+                        else if (filtersettings_request_status == 0)
+                        { // Get the filter cycles log. NOTE: previously gated on faultlog_request_status
+                          // being 2 or 0, but many spas never answer the fault-log request (it sticks at 1),
+                          // which blocked the filter-settings request forever -> filter text fields stayed unknown.
                             output_queue.push(client_id);
                             output_queue.push(0xBF);
                             output_queue.push(0x22);
