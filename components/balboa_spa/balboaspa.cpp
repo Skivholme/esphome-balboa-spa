@@ -822,6 +822,19 @@ namespace esphome
                 spaState.reminder = reminder_value;
             }
 
+            // Keep a copy of the raw payload (bytes 5 .. len-1) for the raw_status diagnostic sensor,
+            // so fields that are not decoded above (spa state, init mode, flags ...) can be inspected.
+            {
+                int payload_len = static_cast<int>(input_queue[1]) - 5;
+                if (payload_len < 0)
+                    payload_len = 0;
+                if (payload_len > SpaState::RAW_STATUS_MAX)
+                    payload_len = SpaState::RAW_STATUS_MAX;
+                for (int i = 0; i < payload_len; i++)
+                    spaState.raw_status[i] = input_queue[5 + i];
+                spaState.raw_status_len = payload_len;
+            }
+
             // TODO: callback on newState
 
             last_state_crc = input_queue[input_queue[1]];

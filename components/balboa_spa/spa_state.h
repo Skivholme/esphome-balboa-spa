@@ -14,6 +14,7 @@ class SpaState {
             target_temp = NAN;
             current_temp = NAN;
             reminder = 0;
+            raw_status_len = 0;
         }
         uint8_t jet1 :2;
         uint8_t jet2 :2;
@@ -32,6 +33,10 @@ class SpaState {
         float target_temp;
         float current_temp;
         uint8_t reminder;
+        // Raw payload of the last status update (FF AF 13), for diagnostics (raw_status text sensor)
+        static const uint8_t RAW_STATUS_MAX = 40;
+        uint8_t raw_status[RAW_STATUS_MAX];
+        uint8_t raw_status_len;
 };
 }  // namespace balboa_spa
 }  // namespace esphome
